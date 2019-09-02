@@ -1,19 +1,14 @@
 package com.goodcub.schedule;
 
-import com.goodcub.core.config.XxlJobConfig;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.goodcub.core.utils.HttpClientUtil;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.JobHandler;
-import com.xxl.job.core.log.XxlJobLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 /**
  * 跨平台Http任务
@@ -24,7 +19,7 @@ import java.net.URL;
 @Component
 public class HttpJobHandler extends IJobHandler {
 
-    private Logger logger = LoggerFactory.getLogger(XxlJobConfig.class);
+    private Logger logger = LoggerFactory.getLogger(HttpJobHandler.class);
 
     private static final String requestUrl = "http://77tj.org/api/tencent/onlineim";
 
@@ -32,10 +27,23 @@ public class HttpJobHandler extends IJobHandler {
     public ReturnT<String> execute(String param) throws Exception {
 
         String tencentResult = HttpClientUtil.doGet(requestUrl);
+        // logger.info("request result -->" + tencentResult);
 
-        logger.info("request result -->" + tencentResult);
+        if(tencentResult!=null && !"".equals(tencentResult)){
+            JSONArray jsonArray = (JSONArray) JSONArray.parse(tencentResult);
+            if(jsonArray != null && jsonArray.size()> 0){
 
-        return ReturnT.SUCCESS;
+                JSONObject obj = jsonArray.getJSONObject(0);
+                logger.info("最近一条记录 >>>>>>>> " + obj.toJSONString());
+
+                return new ReturnT(200,obj.toJSONString());
+            }else{
+                return FAIL;
+            }
+
+        }else{
+            return FAIL;
+        }
     }
 
 }

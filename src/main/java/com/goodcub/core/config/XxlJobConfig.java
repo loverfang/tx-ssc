@@ -1,56 +1,44 @@
 package com.goodcub.core.config;
 
+import com.xxl.job.core.executor.XxlJobExecutor;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * xxl-job config
- *
- * @author xuxueli 2017-04-28
+ * @author Mr.chang
+ * @项目：cloud-parent
+ * @描述：
+ * @创建时间：2017/12/28
+ * @Copyright @2017 by Mr.chang
  */
+
 @Configuration
 public class XxlJobConfig {
+
     private Logger logger = LoggerFactory.getLogger(XxlJobConfig.class);
 
-    @Value("${xxl.job.admin.addresses}")
-    private String adminAddresses;
-
-    @Value("${xxl.job.executor.appname}")
-    private String appName;
-
-    @Value("${xxl.job.executor.ip}")
-    private String ip;
-
-    @Value("${xxl.job.executor.port}")
-    private int port;
-
-    @Value("${xxl.job.accessToken}")
-    private String accessToken;
-
-    @Value("${xxl.job.executor.logpath}")
-    private String logPath;
-
-    @Value("${xxl.job.executor.logretentiondays}")
-    private int logRetentionDays;
-
+    @Autowired
+    private JobProperties jobProperties;
 
     @Bean(initMethod = "start", destroyMethod = "destroy")
-    public XxlJobSpringExecutor xxlJobExecutor() {
+    public XxlJobExecutor xxlJobExecutor() {
         logger.info(">>>>>>>>>>> xxl-job config init.");
-        XxlJobSpringExecutor xxlJobSpringExecutor = new XxlJobSpringExecutor();
-        xxlJobSpringExecutor.setAdminAddresses(adminAddresses);
-        xxlJobSpringExecutor.setAppName(appName);
-        xxlJobSpringExecutor.setIp(ip);
-        xxlJobSpringExecutor.setPort(port);
-        xxlJobSpringExecutor.setAccessToken(accessToken);
-        xxlJobSpringExecutor.setLogPath(logPath);
-        xxlJobSpringExecutor.setLogRetentionDays(logRetentionDays);
-
-        return xxlJobSpringExecutor;
+        logger.info("获取的参数：" + jobProperties.getIp() + "注册地址：" + jobProperties.getAddresses());
+        XxlJobSpringExecutor xxlJobExecutor = new XxlJobSpringExecutor();
+        xxlJobExecutor.setIp(jobProperties.getIp());
+        xxlJobExecutor.setPort(jobProperties.getPort());
+        xxlJobExecutor.setAppName(jobProperties.getAppname());
+        xxlJobExecutor.setAdminAddresses(jobProperties.getAddresses());
+        xxlJobExecutor.setLogPath(jobProperties.getLogpath());
+        xxlJobExecutor.setAccessToken(jobProperties.getAccessToken());
+        xxlJobExecutor.setLogRetentionDays(jobProperties.getLogretentiondays());
+        return xxlJobExecutor;
     }
 
     /**
