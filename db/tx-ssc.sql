@@ -23,7 +23,7 @@ CREATE TABLE `ssc_dingfive_fanfour` (
   `id` bigint(20) NOT NULL,
   `ssc_number` varchar(20) NOT NULL,
   `ssc_shama` varchar(20) DEFAULT NULL,
-  `ssc_taoma` varchar(20) DEFAULT NULL,
+  `ssc_touma` varchar(20) DEFAULT NULL,
   `ssc_dingwei_count` int(11) DEFAULT NULL COMMENT '投注码定位胆中奖个数',
   `ssc_dingwei_amount` decimal(20,4) DEFAULT NULL COMMENT '定位胆中奖金额',
   `ssc_fanma_result` int(11) DEFAULT NULL COMMENT '杀码中3或4个的中奖情况:1中奖，0未中奖',
