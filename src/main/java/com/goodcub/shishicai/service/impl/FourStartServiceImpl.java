@@ -1,6 +1,7 @@
 package com.goodcub.shishicai.service.impl;
 
 import com.goodcub.core.utils.IdWorker;
+import com.goodcub.shishicai.entity.SscDingfiveFanfour;
 import com.goodcub.shishicai.entity.SscHistoryData;
 import com.goodcub.shishicai.entity.SscTempInfo;
 import com.goodcub.shishicai.mapper.SscHistoryDataMapper;
@@ -43,6 +44,21 @@ public class FourStartServiceImpl implements FourStartService {
         // 更新临时表
         int updateCount = sscTempInfoMapper.updateTempResult(sscTempInfo);
 
+
+        // 计算上一期为止应该投注的号码从最近20期中按逆序排列出号码,然后按照百位,千位,十位,万位,个位放入投注号码中
+
+
+
+        // 计算本期中奖的结果
+
+
+
+        // 插入：四星出3码4码_补充定位结果记录
+        SscDingfiveFanfour SscDingfiveFanfour = new SscDingfiveFanfour();
+        SscDingfiveFanfour.setId(idWorker.nextId());
+
+
+
         // 插入数据结果表
         SscHistoryData currentData = new SscHistoryData();
         currentData.setId(idWorker.nextId());
@@ -56,7 +72,7 @@ public class FourStartServiceImpl implements FourStartService {
         currentData.setSscTime(sscTempInfo.getOnlineTime());
         sscHistoryDataMapper.insertHistoryData(currentData);
 
-        // 插入：四星出3码4码_补充定位结果记录
         return updateCount;
     }
+
 }

@@ -9,6 +9,9 @@ spring:
     password: 123456
 
 mybatis:
+  #下划线转驼峰
+  configuration:
+    map-underscore-to-camel-case: true
   mapper-locations: classpath:mapping/**/*Mapper.xml
   type-aliases-package: com.goodcub.shishicai.entity
 

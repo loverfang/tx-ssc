@@ -57,18 +57,24 @@ public class HttpJobHandler extends IJobHandler {
                     JSONObject obj = jsonArray.getJSONObject(0);
                     logger.info("最近一条记录 >>>>>>>> " + obj.toJSONString());
                     String currentTime = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(currentDate);
+                    String targetTimme = obj.getString("onlinetime").substring(0, obj.getString("onlinetime").lastIndexOf(":"));
 
-                    if(obj!=null && !"".equals(obj.getString("onlinetime"))){
+                    if(obj != null && !"".equals(obj.getString("onlinetime"))){
                         logger.info("第"+currentNumber+"期,结果："+results(obj.getString("onlinenumber")));
                         // 期数不同更新时间不是本分钟则修改数据
-                        if(!currentTime.equals(obj.getString("onlinetime"))){
+                        if(currentTime.equals(targetTimme)){
                             SscTempInfo tempInfo = new SscTempInfo();
                             tempInfo.setId(1L);
                             tempInfo.setSscNumber(currentNumber);
                             tempInfo.setOnlineNumber(obj.getString("onlinenumber"));
                             tempInfo.setOnlineChange(obj.getString("onlinechange"));
                             tempInfo.setOnlineTime(obj.getString("onlinetime"));
-                            fourStartService.updateOpenResult(tempInfo, results(obj.getString("onlinenumber")));
+
+                            SscTempInfo checkSscTempInfo =  fourStartService.queryCurentInfoById();
+                            // 防止超长任务产生的重复执行问题
+                            if(!currentNumber.equals(checkSscTempInfo.getSscNumber())) {
+                                fourStartService.updateOpenResult(tempInfo, results(obj.getString("onlinenumber")));
+                            }
                         }
                         return new ReturnT(200,obj.toJSONString());
                     }else{
@@ -76,7 +82,7 @@ public class HttpJobHandler extends IJobHandler {
                         // 官方数据开奖缓慢或者数据错误
                         // 用上期的数据填充(或者直接不管他数据情况),注意此处在本分钟结尾的时候修改
                         Integer currentSecond = Integer.valueOf(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(currentDate).substring(currentTime.length()-2));
-                        if(currentSecond>=58){
+                        if(currentSecond >= 58){
                             logger.debug("数据加载失败,默认数据填充！！！");
                             SscTempInfo tempInfo = new SscTempInfo();
                             tempInfo.setId(1L);

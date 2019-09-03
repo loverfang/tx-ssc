@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.goodcub.shishicai.mapper.SscTempInfoMapper">
+<mapper namespace="com.goodcub.shishicai.mapper.SscHistoryDataMapper">
 
     <!-- 查询指定客服的预订或认筹单类型 -->
-    <insert id="insertHistoryData" parameterType="SscHistoryData">
+    <insert id="insertHistoryData" parameterType="com.goodcub.shishicai.entity.SscHistoryData">
         insert into ssc_history_data ( id,ssc_number,wan,qian,bai,shi,ge,result,ssc_time)
         value(#{id},#{sscNumber},#{wan},#{qian},#{bai},#{shi},#{ge},#{result},#{sscTime})
     </insert>
