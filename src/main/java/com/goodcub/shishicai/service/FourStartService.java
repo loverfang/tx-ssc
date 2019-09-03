@@ -6,7 +6,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * @Author Luo.z.x
- * @Description: 四星出3码4码_补充定为
+ * @Description: 四星出3码4码_补充定位
  * @Date 2019/9/2
  * @Version V1.0
  **/
@@ -18,5 +18,11 @@ public interface FourStartService {
      */
     SscTempInfo queryCurentInfoById();
 
+    /**
+     * 更新开奖结果(四星出3码4码_补充定位)
+     * @param sscTempInfo
+     * @return
+     */
+    int updateOpenResult(SscTempInfo sscTempInfo, String result);
 
 }

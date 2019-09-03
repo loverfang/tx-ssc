@@ -11,5 +11,9 @@ import org.apache.commons.logging.LogFactory;
  * @Version V1.0
  **/
 public interface SscTempInfoMapper {
+
     SscTempInfo queryCurentInfoById();
+
+    int updateTempResult(SscTempInfo sscTempInfo);
+
 }

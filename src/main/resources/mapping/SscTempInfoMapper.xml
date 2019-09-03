@@ -7,5 +7,14 @@
         SELECT * from  ssc_temp_info where id = 1
     </select>
 
-
+    <update id="updateTempResult"  parameterType="com.goodcub.shishicai.entity.SscTempInfo">
+        UPDATE ssc_temp_info
+        <trim prefix="set" suffixOverrides=",">
+            <if test="sscNumber!=null">ssc_number=#{sscNumber},</if>
+            <if test="onlineNumber!=null">online_number=#{onlineNumber},</if>
+            <if test="onlineChange!=null">online_change=#{onlineChange},</if>
+            <if test="onlineTime!=null">online_time=#{onlineTime},</if>
+        </trim>
+        WHERE id=#{id}
+    </update>
 </mapper>

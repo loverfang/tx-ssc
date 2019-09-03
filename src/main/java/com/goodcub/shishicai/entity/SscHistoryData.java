@@ -22,5 +22,5 @@ public class SscHistoryData {
     private String shi;
     private String ge;
     private String result;
-    private Date ssc_time;
+    private String sscTime;
 }
