@@ -12,8 +12,17 @@ import org.apache.commons.logging.LogFactory;
  **/
 public interface SscTempInfoMapper {
 
+    /**
+     * 获得临时表中当前期数信息
+     * @return
+     */
     SscTempInfo queryCurentInfoById();
 
+    /**
+     * 更新临时信息表
+     * @param sscTempInfo
+     * @return
+     */
     int updateTempResult(SscTempInfo sscTempInfo);
 
 }

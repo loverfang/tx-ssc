@@ -8,4 +8,8 @@
         value(#{id},#{sscNumber},#{wan},#{qian},#{bai},#{shi},#{ge},#{result},#{sscTime})
     </insert>
 
+    <select id="queryNearHistory" resultType="com.goodcub.shishicai.entity.SscHistoryData">
+        select * from ssc_history_data order by ssc_time desc limit 20
+    </select>
+
 </mapper>

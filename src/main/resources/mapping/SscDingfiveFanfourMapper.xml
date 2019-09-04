@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.goodcub.shishicai.mapper.SscDingfiveFanfourMapper">
+
+    <!-- 查询指定客服的预订或认筹单类型 -->
+    <insert id="insertDingfiveFanfour" parameterType="com.goodcub.shishicai.entity.SscDingfiveFanfour">
+        insert into ssc_dingfive_fanfour (id,ssc_number,ssc_shama,ssc_touma,ssc_dingwei_count,ssc_dingwei_amount,ssc_fanma_result,scc_fanma_amount,scc_total_amount)
+        value(
+        #{id},#{sscNumber},
+        #{sscShama},#{sscTouma},#{sscDingweiCount},#{sscDingweiAmount},#{sscFanmaResult},#{sccFanmaAmount},#{sccTotalAmount})
+    </insert>
+
+</mapper>
