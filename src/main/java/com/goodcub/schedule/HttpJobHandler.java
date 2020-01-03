@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.goodcub.core.utils.HttpClientUtil;
 import com.goodcub.shishicai.entity.SscTempInfo;
 import com.goodcub.shishicai.service.FourStartService;
+import com.goodcub.shishicai.service.HeimaService;
 import com.goodcub.shishicai.service.impl.FourStartServiceImpl;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
@@ -34,7 +35,7 @@ public class HttpJobHandler extends IJobHandler {
     private static final String requestUrl = "http://77tj.org/api/tencent/onlineim";
 
     @Resource
-    FourStartService fourStartService;
+    HeimaService heimaService;
 
     @Override
     public ReturnT<String> execute(String param) throws Exception {
@@ -42,7 +43,7 @@ public class HttpJobHandler extends IJobHandler {
         String currentNumber = number();
         Date currentDate = new Date();
 
-        SscTempInfo sscTempInfo =  fourStartService.queryCurentInfoById();
+        SscTempInfo sscTempInfo =  heimaService.queryCurentInfoById();
 
         //期数不相同
         if(!currentNumber.equals(sscTempInfo.getSscNumber())){
@@ -61,6 +62,7 @@ public class HttpJobHandler extends IJobHandler {
 
                     if(obj != null && !"".equals(obj.getString("onlinetime"))){
                         logger.info("第"+currentNumber+"期,结果："+results(obj.getString("onlinenumber")));
+
                         // 期数不同更新时间不是本分钟则修改数据
                         if(currentTime.equals(targetTimme)){
                             SscTempInfo tempInfo = new SscTempInfo();
@@ -70,12 +72,14 @@ public class HttpJobHandler extends IJobHandler {
                             tempInfo.setOnlineChange(obj.getString("onlinechange"));
                             tempInfo.setOnlineTime(obj.getString("onlinetime"));
 
-                            SscTempInfo checkSscTempInfo =  fourStartService.queryCurentInfoById();
+                            SscTempInfo checkSscTempInfo =  heimaService.queryCurentInfoById();
+
                             // 防止超长任务产生的重复执行问题
                             if(!currentNumber.equals(checkSscTempInfo.getSscNumber())) {
-                                fourStartService.updateOpenResult(tempInfo, results(obj.getString("onlinenumber")));
+                                heimaService.updateOpenResult(tempInfo, results(obj.getString("onlinenumber")),checkSscTempInfo.getCurrentDan());
                             }
                         }
+
                         return new ReturnT(200,obj.toJSONString());
                     }else{
                         logger.debug("数据加载失败!!!!");
@@ -87,7 +91,7 @@ public class HttpJobHandler extends IJobHandler {
                             SscTempInfo tempInfo = new SscTempInfo();
                             tempInfo.setId(1L);
                             tempInfo.setOnlineTime(obj.getString("onlinetime"));
-                            fourStartService.updateOpenResult(tempInfo, results(obj.getString("onlinenumber")));
+                            heimaService.updateOpenResult(tempInfo, results(obj.getString("onlinenumber")), sscTempInfo.getCurrentDan());
                         }
                         return new ReturnT(200,obj.toJSONString());
                     }

@@ -48,6 +48,7 @@ public class FourStartServiceImpl implements FourStartService {
 
     @Override
     public int updateOpenResult(SscTempInfo sscTempInfo, String result) {
+
         Set<Integer> numbersSet = new HashSet<Integer>(){{add(0);add(1);add(2);add(3);add(4);add(5);add(6);add(7);add(8);add(9);}};
 
         // 获取最近的20条数据
@@ -85,6 +86,13 @@ public class FourStartServiceImpl implements FourStartService {
         currentData.setSscTime(sscTempInfo.getOnlineTime());
         sscHistoryDataMapper.insertHistoryData(currentData);
 
+        // 后四号码个数,验证是否有重号，有重号就算中,没有重号就算挂
+        Set<String> housiNoSet = new HashSet<>();
+        housiNoSet.add(currentData.getQian());
+        housiNoSet.add(currentData.getBai());
+        housiNoSet.add(currentData.getShi());
+        housiNoSet.add(currentData.getGe());
+
         // 计算本期中奖的结果
         // 插入：四星出3码4码_补充定位结果记录
         SscDingfiveFanfour sscDingfiveFanfour = new SscDingfiveFanfour();
@@ -121,13 +129,17 @@ public class FourStartServiceImpl implements FourStartService {
                 }
             }
         }
+
         logger.info("杀码后四个数:" + rongcuoCount);
-        sscDingfiveFanfour.setSscFanmaResult(rongcuoCount>=3?1:0); //'杀码中3或4个的中奖情况:1中奖，0未中奖',
-        sscDingfiveFanfour.setSccFanmaAmount((rongcuoCount>=3?1:0)*19.56);   //'反码中奖金额', 3.36
+        // 后四是否中奖
+        Boolean housiResult =(rongcuoCount>=3 && housiNoSet.size()<4);
+        sscDingfiveFanfour.setSscFanmaResult(housiResult?1:0); //'杀码中3或4个的中奖情况:1中奖，0未中奖',
+        sscDingfiveFanfour.setSccFanmaAmount((housiResult?1:0)*19.56);   //'反码中奖金额', 3.36
          ////////////////////////////////杀码结束//////////////////////////////////////////////////
-        Double lirun = dingweiCount * 9.78 + (rongcuoCount>=3?1:0)*19.56 - 3.36 - 25;
+
+        Double lirun = dingweiCount * 9.78 + (housiResult?1:0)*19.56 - 3.61 - 25;
         logger.info("当期利润:" + lirun);
-        sscDingfiveFanfour.setSccTotalAmount(lirun); //'档期最后利润': 定位胆中奖个数*9.78 + 反杀中奖金额 - 25定位胆成本-反杀成本
+        sscDingfiveFanfour.setSccTotalAmount(lirun); //'档期最后利润': 定位胆中奖个数*9.78 + 反杀中奖金额 - 25定位胆成本- 反杀成本
 
         sscDingfiveFanfourMapper.insertDingfiveFanfour(sscDingfiveFanfour);
         return updateCount;

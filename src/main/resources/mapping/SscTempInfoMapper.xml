@@ -4,7 +4,12 @@
 
     <!-- 查询指定客服的预订或认筹单类型 -->
     <select id="queryCurentInfoById" resultType="com.goodcub.shishicai.entity.SscTempInfo">
-        SELECT * from  ssc_temp_info where id = 1
+        SELECT
+          t.*, attr.current_dan
+        from
+          ssc_temp_info as t
+          inner join ssc_temp_info_attr as attr on attr.id = t.id
+        where id = 1
     </select>
 
     <update id="updateTempResult"  parameterType="com.goodcub.shishicai.entity.SscTempInfo">

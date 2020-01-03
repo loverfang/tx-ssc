@@ -19,7 +19,7 @@ public interface FourStartService {
     SscTempInfo queryCurentInfoById();
 
     /**
-     * 更新开奖结果(四星出3码4码_补充定位)
+     * 更新开奖结果(黑马思路)
      * @param sscTempInfo
      * @return
      */
