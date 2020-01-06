@@ -3,6 +3,9 @@ package com.goodcub.shishicai.mapper;
 import com.goodcub.shishicai.entity.SscTempInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Map;
 
 /**
  * @Author Luo.z.x
@@ -25,4 +28,5 @@ public interface SscTempInfoMapper {
      */
     int updateTempResult(SscTempInfo sscTempInfo);
 
+    int updateCurrentDan(Map<String,Object> paramMap);
 }

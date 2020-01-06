@@ -1,9 +1,11 @@
 package com.goodcub.shishicai.service.impl;
 
 import com.goodcub.core.utils.IdWorker;
+import com.goodcub.shishicai.entity.SscDanMaKuaHewei;
 import com.goodcub.shishicai.entity.SscDingfiveFanfour;
 import com.goodcub.shishicai.entity.SscHistoryData;
 import com.goodcub.shishicai.entity.SscTempInfo;
+import com.goodcub.shishicai.mapper.SscDanmaKuaHeweiMapper;
 import com.goodcub.shishicai.mapper.SscDingfiveFanfourMapper;
 import com.goodcub.shishicai.mapper.SscHistoryDataMapper;
 import com.goodcub.shishicai.mapper.SscTempInfoMapper;
@@ -13,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -41,122 +44,156 @@ public class HeimaServiceImpl implements HeimaService {
     private SscHistoryDataMapper sscHistoryDataMapper;
 
     @Resource
-    private SscDingfiveFanfourMapper sscDingfiveFanfourMapper;
+    private SscDanmaKuaHeweiMapper sscDanmaKuaHeweiMapper;
 
     @Override
     public SscTempInfo queryCurentInfoById() {
         return sscTempInfoMapper.queryCurentInfoById();
     }
 
-
     @Override
-    public int updateOpenResult(SscTempInfo sscTempInfo, String result, String currentDan) {
+    @Transactional
+    public void updateOpenResult(SscTempInfo sscTempInfo, String result, String currentDan, String preNumber) {
+        try {
+            // 更新临时表
+            sscTempInfoMapper.updateTempResult(sscTempInfo);
 
-        // 更新临时表
-        int updateCount = sscTempInfoMapper.updateTempResult(sscTempInfo);
+            // 插入数据结果表
+            SscHistoryData currentData = new SscHistoryData();
+            currentData.setId(idWorker.nextId());
+            currentData.setSscNumber(sscTempInfo.getSscNumber());
+            currentData.setWan(result.split(",")[0]);
+            currentData.setQian(result.split(",")[1]);
+            currentData.setBai(result.split(",")[2]);
+            currentData.setShi(result.split(",")[3]);
+            currentData.setGe(result.split(",")[4]);
+            currentData.setResult(result);
+            currentData.setSscTime(sscTempInfo.getOnlineTime());
+            sscHistoryDataMapper.insertHistoryData(currentData);
 
-        // 插入数据结果表
-        SscHistoryData currentData = new SscHistoryData();
-        currentData.setId(idWorker.nextId());
-        currentData.setSscNumber(sscTempInfo.getSscNumber());
-        currentData.setWan(result.split(",")[0]);
-        currentData.setQian(result.split(",")[1]);
-        currentData.setBai(result.split(",")[2]);
-        currentData.setShi(result.split(",")[3]);
-        currentData.setGe(result.split(",")[4]);
-        currentData.setResult(result);
-        currentData.setSscTime(sscTempInfo.getOnlineTime());
-        sscHistoryDataMapper.insertHistoryData(currentData);
+            // 后三的结果
+            String resultStr = result.split(",")[2] + "," + result.split(",")[3] + "," + result.split(",")[4];
+            if(!StringUtils.isBlank(resultStr)) {
 
-        // 后三的结果
-        String resultStr = result.split(",")[2] + "," + result.split(",")[3] + "," + result.split(",")[4];
-        if(!StringUtils.isBlank(resultStr)) {
+                String[] resultArr = resultStr.split(",");
 
-            String[] resultArr = resultStr.split(",");
+                // 黑马玩法对应的信息
+                SscDanMaKuaHewei sscDanMaKuaHewei = new SscDanMaKuaHewei();
+                sscDanMaKuaHewei.setId(idWorker.nextId());
+                sscDanMaKuaHewei.setSscNumber(sscTempInfo.getSscNumber());
 
-            // step1 确定胆码
-            // 是否换胆? 换大胆还是换小胆:0表示不换,1表示还成小胆,2表示换成大胆
-            int switchTag = isSwitch(resultArr);
+                // step1 确定胆码
+                // 是否换胆? 换大胆还是换小胆:0表示不换,1表示还成小胆,2表示换成大胆
+                int switchTag = isSwitch(resultArr);
+                sscDanMaKuaHewei.setSscSwitch(switchTag);
 
-            String newDanStr = currentDan;
-
-            // 等于0或者需要换的大小码与上一把胆码相同那么就不换胆
-            if(switchTag == 1){
-                // 换成小
-                newDanStr = "0,1,2,3,4,";
-            }else if(switchTag == 2){
-                // 换成大
-                newDanStr = "5,6,7,8,9,";
-            }
-
-
-            // 更新ssc_temp_info_attr表
-            // TODO
-
-
-            //step2 得到三个数的和值
-            int sumValue = sumValue(resultArr);
-            //step3 得到三个数的和尾值
-            int heweiValue = sumValueLast(sumValue);
-            //step4 根据和尾值得到它的对码值
-            int duimaValue = sumDuishu(heweiValue);
-
-
-            //step5 胆码中包含对码,就杀对码,没有对码就一定含有和尾值就杀和尾
-            String newDan = "";
-            if(newDanStr.contains(String.valueOf(duimaValue))){
-                newDan = newDanStr.replace(String.valueOf(duimaValue)+",","");
-            }else if (newDanStr.contains(String.valueOf(heweiValue))){
-                newDan = newDanStr.replace(String.valueOf(heweiValue)+",","");
-            }
-
-            String danStr = newDan.substring(0, newDan.length() - 1);
-            System.out.println("最后胆码:" + danStr);
-
-            // step6 用胆码生成号码
-            List<String> resultList = resultArr(newDan.substring(0, newDan.length() - 1));
-
-            System.out.println("由胆码生成的号码:" + resultList.toString());
-            System.out.println("号码个数:" + resultList.size());
-
-            // step7 获取跨度
-            int kuaduValue = kuadu(resultArr);
-            System.out.println("跨度值:" + kuaduValue);
-
-
-            List<String> finallResultList = new ArrayList<>();
-            // step8 排除和值尾
-            resultList.forEach(item -> {
-                int len = item.length();
-
-                int heVal = 0;
-                for (int x=0;x<len; x++){
-                    String c = String.valueOf(item.charAt(x));
-                    heVal = heVal + Integer.valueOf(c);
+                String newDanStr = currentDan;
+                // 等于0或者需要换的大小码与上一把胆码相同那么就不换胆
+                if(switchTag == 1){
+                    // 换成小
+                    newDanStr = "0,1,2,3,4,";
+                }else if(switchTag == 2){
+                    // 换成大
+                    newDanStr = "5,6,7,8,9,";
                 }
 
-                if(heVal != kuaduValue && heVal%10 != kuaduValue){
-                    finallResultList.add(item);
+                // 更新ssc_temp_info_attr表,记录下一把做号应该采用的胆码,和需要需要修改的记录的期数
+                Map<String,Object> paramMap = new HashMap<>();
+                paramMap.put("currentDan",newDanStr);
+                paramMap.put("preNumber",sscTempInfo.getSscNumber());
+                sscTempInfoMapper.updateCurrentDan(paramMap);
+
+                sscDanMaKuaHewei.setSscDanmaAll(newDanStr);
+
+                //step2 得到三个数的和值
+                int sumValue = sumValue(resultArr);
+                sscDanMaKuaHewei.setSscHe(sumValue);
+                //step3 得到三个数的和尾值
+                int heweiValue = sumValueLast(sumValue);
+                sscDanMaKuaHewei.setSscHewei(heweiValue);
+                //step4 根据和尾值得到它的对码值
+                int duimaValue = sumDuishu(heweiValue);
+                sscDanMaKuaHewei.setSscHeweiDuima(duimaValue);
+
+                //step5 胆码中包含对码,就杀对码,没有对码就一定含有和尾值就杀和尾
+                String newDan = "";
+                if(newDanStr.contains(String.valueOf(duimaValue))){
+                    newDan = newDanStr.replace(String.valueOf(duimaValue)+",","");
+                    sscDanMaKuaHewei.setSscShadan(duimaValue);
+                }else if (newDanStr.contains(String.valueOf(heweiValue))){
+                    newDan = newDanStr.replace(String.valueOf(heweiValue)+",","");
+                    sscDanMaKuaHewei.setSscShadan(heweiValue);
                 }
-            });
 
-            finallResultList.forEach(item -> {
-                System.out.println("投注码:" + item);
-            });
+                String danStr = newDan.substring(0, newDan.length() - 1);
+                sscDanMaKuaHewei.setSscDanmaTou(danStr);
+                System.out.println("最后胆码:" + danStr);
 
-            System.out.println("总共：" + finallResultList.size() + "注");
-        }else{
-            System.out.println("watting next ...");
+                // step6 用胆码生成号码
+                List<String> resultList = resultArr(newDan.substring(0, newDan.length() - 1));
+
+                System.out.println("由胆码生成的号码:" + resultList.toString());
+                System.out.println("号码个数:" + resultList.size());
+
+                // step7 获取跨度
+                int kuaduValue = kuadu(resultArr);
+                sscDanMaKuaHewei.setSscKuadu(kuaduValue);
+                System.out.println("跨度值:" + kuaduValue);
+
+
+                List<String> finallResultList = new ArrayList<>();
+                // step8 排除和值尾
+                resultList.forEach(item -> {
+                    int len = item.length();
+
+                    int heVal = 0;
+                    for (int x=0;x<len; x++){
+                        String c = String.valueOf(item.charAt(x));
+                        heVal = heVal + Integer.valueOf(c);
+                    }
+
+                    if(heVal != kuaduValue && heVal%10 != kuaduValue){
+                        finallResultList.add(item);
+                    }
+                });
+
+                //胆码 和值对码 杀码 跨度 和尾 投注号码 是否中奖 下注这把切换情况(上一轮是否出现同大同小) 成本 利润(未中奖0)
+                sscDanMaKuaHewei.setSscTouzhuma(StringUtils.strip(finallResultList.toString(),"[]"));
+                int zhumaCount = finallResultList.size();
+                sscDanMaKuaHewei.setSscTouzhumaCount(zhumaCount);
+
+                sscDanmaKuaHeweiMapper.insertDanmaKuaHewei(sscDanMaKuaHewei);
+
+
+                // 更新结果表
+                // 上一期的期数,获得它的号码
+                SscDanMaKuaHewei preSscDanMaKuaHewei = sscDanmaKuaHeweiMapper.querySscDanMaKuaHeweiBySscNumber(preNumber);
+
+                if(preSscDanMaKuaHewei!=null) {
+                    SscDanMaKuaHewei updateSscDanMaKuaHewei = new SscDanMaKuaHewei();
+                    updateSscDanMaKuaHewei.setId( preSscDanMaKuaHewei.getId() );
+                    // 判断是否中奖
+                    String preZhuMa = preSscDanMaKuaHewei.getSscTouzhuma();
+                    String housanResult = resultArr[0].concat(resultArr[1]).concat(resultArr[2]);
+
+                    if(preZhuMa.contains(housanResult)){
+                        updateSscDanMaKuaHewei.setSscIsZhong(1);
+                        //updateSscDanMaKuaHewei.setSscShouyi("9.78");
+                    }else{
+                        updateSscDanMaKuaHewei.setSscIsZhong(0);
+                        //updateSscDanMaKuaHewei.setSscShouyi(zhumaCount );
+                    }
+                    // 更新中奖结果
+                    sscDanmaKuaHeweiMapper.updateDanmaKuaHewei(updateSscDanMaKuaHewei);
+                }
+
+            }else{
+                System.out.println("watting next ...");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
-
-        // 更新结果表
-        // TODO
-
-
-        // sscDingfiveFanfourMapper.insertDingfiveFanfour(sscDingfiveFanfour);
-        return updateCount;
     }
-
 
     public static int kuadu(String[] resultArr){
         java.util.Arrays.sort(resultArr);

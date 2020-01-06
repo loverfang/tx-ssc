@@ -76,7 +76,7 @@ public class HttpJobHandler extends IJobHandler {
 
                             // 防止超长任务产生的重复执行问题
                             if(!currentNumber.equals(checkSscTempInfo.getSscNumber())) {
-                                heimaService.updateOpenResult(tempInfo, results(obj.getString("onlinenumber")),checkSscTempInfo.getCurrentDan());
+                                heimaService.updateOpenResult(tempInfo, results(obj.getString("onlinenumber")),checkSscTempInfo.getCurrentDan(), checkSscTempInfo.getPreNumber());
                             }
                         }
 
@@ -91,7 +91,7 @@ public class HttpJobHandler extends IJobHandler {
                             SscTempInfo tempInfo = new SscTempInfo();
                             tempInfo.setId(1L);
                             tempInfo.setOnlineTime(obj.getString("onlinetime"));
-                            heimaService.updateOpenResult(tempInfo, results(obj.getString("onlinenumber")), sscTempInfo.getCurrentDan());
+                            heimaService.updateOpenResult(tempInfo, results(obj.getString("onlinenumber")), sscTempInfo.getCurrentDan(), sscTempInfo.getPreNumber());
                         }
                         return new ReturnT(200,obj.toJSONString());
                     }

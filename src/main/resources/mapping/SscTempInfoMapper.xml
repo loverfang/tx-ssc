@@ -5,11 +5,11 @@
     <!-- 查询指定客服的预订或认筹单类型 -->
     <select id="queryCurentInfoById" resultType="com.goodcub.shishicai.entity.SscTempInfo">
         SELECT
-          t.*, attr.current_dan
+          t.*, attr.current_dan,attr.pre_number
         from
           ssc_temp_info as t
           inner join ssc_temp_info_attr as attr on attr.id = t.id
-        where id = 1
+        where t.id = 1
     </select>
 
     <update id="updateTempResult"  parameterType="com.goodcub.shishicai.entity.SscTempInfo">
@@ -22,5 +22,9 @@
         </trim>
         WHERE id=#{id}
     </update>
-    
+
+    <update id="updateCurrentDan">
+        update ssc_temp_info_attr set current_dan = #{currentDan},pre_number = #{preNumber} where id = 1
+    </update>
+
 </mapper>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.goodcub.shishicai.mapper.SscDanmaKuaHeweiMapper">
+
+    <!-- 查询指定客服的预订或认筹单类型 -->
+    <insert id="insertDanmaKuaHewei" parameterType="com.goodcub.shishicai.entity.SscDanMaKuaHewei">
+       insert into ssc_danma_kua_hewei(
+         id,
+         ssc_number,
+         ssc_danma_all,
+         ssc_danma_tou,
+         ssc_he,
+         ssc_hewei,
+         ssc_hewei_duima,
+         ssc_shadan,
+         ssc_kuadu,
+         ssc_switch,
+         ssc_touzhuma,
+         ssc_touzhuma_count,
+         ssc_shouyi,
+         ssc_is_zhong
+       )value(
+         #{id},
+         #{sscNumber},
+         #{sscDanmaAll},
+         #{sscDanmaTou},
+         #{sscHe},
+         #{sscHewei},
+         #{sscHeweiDuima},
+         #{sscShadan},
+         #{sscKuadu},
+         #{sscSwitch},
+         #{sscTouzhuma},
+         #{sscTouzhumaCount},
+         #{sscShouyi},
+         #{sscIsZhong}
+       )
+    </insert>
+
+    <update id="updateDanmaKuaHewei" parameterType="com.goodcub.shishicai.entity.SscDanMaKuaHewei">
+        UPDATE ssc_danma_kua_hewei
+        <trim prefix="set" suffixOverrides=",">
+            <if test="sscNumber!=null">ssc_number=#{sscNumber},</if>
+            <if test="sscDanmaAll!=null">ssc_danma_all=#{sscDanmaAll},</if>
+            <if test="sscDanmaTou!=null">ssc_danma_tou=#{sscDanmaTou},</if>
+            <if test="sscHe!=null">ssc_he=#{sscHe},</if>
+            <if test="sscHewei!=null">ssc_hewei=#{sscHewei},</if>
+            <if test="sscHeweiDuima!=null">ssc_hewei_duima=#{sscHeweiDuima},</if>
+            <if test="sscShadan!=null">ssc_shadan=#{sscShadan},</if>
+            <if test="sscKuadu!=null">ssc_kuadu=#{sscKuadu},</if>
+            <if test="sscSwitch!=null">ssc_switch=#{sscSwitch},</if>
+            <if test="sscTouzhuma!=null">ssc_touzhuma=#{sscTouzhuma},</if>
+            <if test="sscTouzhumaCount!=null">ssc_touzhuma_count=#{sscTouzhumaCount},</if>
+            <if test="sscShouyi!=null">ssc_shouyi=#{sscShouyi},</if>
+            <if test="sscIsZhong!=null">ssc_is_zhong=#{sscIsZhong},</if>
+        </trim>
+        WHERE id=#{id}
+    </update>
+
+    <select id="querySscDanMaKuaHeweiBySscNumber" resultType="com.goodcub.shishicai.entity.SscDanMaKuaHewei">
+        select * from ssc_danma_kua_hewei where ssc_number=#{sscNumber}
+    </select>
+
+</mapper>

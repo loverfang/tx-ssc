@@ -18,4 +18,5 @@ public class SscTempInfo {
     private String onlineChange;
     private String onlineTime;
     private String currentDan;
+    private String preNumber;
 }
