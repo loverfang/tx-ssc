@@ -9,6 +9,7 @@ import com.goodcub.shishicai.entity.SscDanMaKuaHewei;
 import com.goodcub.shishicai.mapper.SscDanmaKuaHeweiMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
@@ -18,6 +19,7 @@ import javax.annotation.Resource;
  * @Date 2020/1/6
  * @Version V1.0
  **/
+@Service
 public class ApiHeimaServiceImpl implements ApiHeimaService {
 
     protected Log log = LogFactory.getLog(this.getClass());
