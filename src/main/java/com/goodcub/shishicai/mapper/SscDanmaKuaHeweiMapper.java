@@ -4,6 +4,8 @@ import com.goodcub.shishicai.entity.SscDanMaKuaHewei;
 import com.goodcub.shishicai.entity.SscTempInfo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * @Author Luo.z.x
  * @Description: TODO
@@ -33,5 +35,11 @@ public interface SscDanmaKuaHeweiMapper {
      * @return
      */
     SscDanMaKuaHewei querySscDanMaKuaHeweiBySscNumber(String sscNumber);
+
+    /**
+     * 查询所有结果
+     * @return
+     */
+    List<SscDanMaKuaHewei> querySscDanMaKuaHeweiList();
 
 }

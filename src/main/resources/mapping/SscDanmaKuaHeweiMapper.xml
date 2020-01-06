@@ -61,4 +61,8 @@
         select * from ssc_danma_kua_hewei where ssc_number=#{sscNumber}
     </select>
 
+    <select id="querySscDanMaKuaHeweiList" resultType="com.goodcub.shishicai.entity.SscDanMaKuaHewei">
+        select * from ssc_danma_kua_hewei
+    </select>
+
 </mapper>

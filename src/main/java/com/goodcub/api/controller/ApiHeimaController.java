@@ -1,6 +1,6 @@
 package com.goodcub.api.controller;
 
-import com.goodcub.api.entity.SscDanMaKuaHeweiVo;
+import com.goodcub.api.service.ApiHeimaService;
 import com.goodcub.core.utils.ResultResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -8,8 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.Resource;
 
 /**
  * @Author Luo.z.x
@@ -22,10 +21,13 @@ import java.util.List;
 public class ApiHeimaController {
     protected Log log = LogFactory.getLog(this.getClass());
 
+    @Resource
+    private ApiHeimaService apiHeimaService;
+
     @RequestMapping("/result")
     @ResponseBody
-    public ResultResponse result(){
-        List<SscDanMaKuaHeweiVo> resultList = new ArrayList<>();
-        return ResultResponse.ok().put("data", resultList);
+    public ResultResponse result(int page, int limit){
+        return ResultResponse.ok().put("data", apiHeimaService.resultList(page, limit));
     }
+
 }
