@@ -2,7 +2,6 @@ package com.goodcub.api.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.goodcub.api.entity.SscDanMaKuaHeweiVo;
 import com.goodcub.api.service.ApiHeimaService;
 import com.goodcub.core.utils.page.TableDataInfo;
 import com.goodcub.shishicai.entity.SscDanMaKuaHewei;
@@ -12,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Author Luo.z.x
@@ -28,10 +28,11 @@ public class ApiHeimaServiceImpl implements ApiHeimaService {
     SscDanmaKuaHeweiMapper sscDanmaKuaHeweiMapper;
 
     @Override
-    public TableDataInfo resultList(int page, int limit) {
+    public TableDataInfo resultList(int page, int limit, String order) {
 
-        PageHelper.startPage(page, limit).setOrderBy("ssc_number desc");
-        PageInfo<SscDanMaKuaHewei> resultPageInfo = new PageInfo<>(sscDanmaKuaHeweiMapper.querySscDanMaKuaHeweiList());
+        PageHelper.startPage(page, limit).setOrderBy("ssc_number "+order);
+        List<SscDanMaKuaHewei>  resultList = sscDanmaKuaHeweiMapper.querySscDanMaKuaHeweiList();
+        PageInfo<SscDanMaKuaHewei> resultPageInfo = new PageInfo<>(resultList);
 
         TableDataInfo tableDataInfo = new TableDataInfo();
         tableDataInfo.setItems(resultPageInfo.getList());

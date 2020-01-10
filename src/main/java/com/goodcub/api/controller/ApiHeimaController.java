@@ -6,7 +6,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
@@ -16,7 +18,7 @@ import javax.annotation.Resource;
  * @Date 2020/1/6
  * @Version V1.0
  **/
-@Controller
+@RestController
 @RequestMapping("api")
 public class ApiHeimaController {
     protected Log log = LogFactory.getLog(this.getClass());
@@ -26,8 +28,8 @@ public class ApiHeimaController {
 
     @RequestMapping("/result")
     @ResponseBody
-    public ResultResponse result(int page, int limit){
-        return ResultResponse.ok().put("data", apiHeimaService.resultList(page, limit));
+    public ResultResponse result(int page, int limit, String order){
+        return ResultResponse.ok().put("data", apiHeimaService.resultList(page, limit, order == null ? "asc":order));
     }
 
 }

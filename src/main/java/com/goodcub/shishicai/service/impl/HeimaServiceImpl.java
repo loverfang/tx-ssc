@@ -127,18 +127,18 @@ public class HeimaServiceImpl implements HeimaService {
 
                 String danStr = newDan.substring(0, newDan.length() - 1);
                 sscDanMaKuaHewei.setSscDanmaTou(danStr);
-                System.out.println("最后胆码:" + danStr);
+                // System.out.println("最后胆码:" + danStr);
 
                 // step6 用胆码生成号码
                 List<String> resultList = resultArr(newDan.substring(0, newDan.length() - 1));
 
-                System.out.println("由胆码生成的号码:" + resultList.toString());
-                System.out.println("号码个数:" + resultList.size());
+                // System.out.println("由胆码生成的号码:" + resultList.toString());
+                // System.out.println("号码个数:" + resultList.size());
 
                 // step7 获取跨度
                 int kuaduValue = kuadu(resultArr);
                 sscDanMaKuaHewei.setSscKuadu(kuaduValue);
-                System.out.println("跨度值:" + kuaduValue);
+                // System.out.println("跨度值:" + kuaduValue);
 
 
                 List<String> finallResultList = new ArrayList<>();
@@ -188,7 +188,7 @@ public class HeimaServiceImpl implements HeimaService {
                 }
 
             }else{
-                System.out.println("watting next ...");
+                // System.out.println("watting next ...");
             }
         }catch (Exception e){
             e.printStackTrace();

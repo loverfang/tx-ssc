@@ -13,5 +13,5 @@ import org.apache.commons.logging.LogFactory;
  * @Version V1.0
  **/
 public interface ApiHeimaService {
-    TableDataInfo resultList(int page, int limit);
+    TableDataInfo resultList(int page, int limit, String order);
 }

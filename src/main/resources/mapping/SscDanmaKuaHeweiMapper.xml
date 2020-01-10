@@ -58,11 +58,23 @@
     </update>
 
     <select id="querySscDanMaKuaHeweiBySscNumber" resultType="com.goodcub.shishicai.entity.SscDanMaKuaHewei">
-        select * from ssc_danma_kua_hewei where ssc_number=#{sscNumber}
+        select s.ssc_number,s.ssc_touzhuma from ssc_danma_kua_hewei as s where s.ssc_number=#{sscNumber}
     </select>
 
     <select id="querySscDanMaKuaHeweiList" resultType="com.goodcub.shishicai.entity.SscDanMaKuaHewei">
-        select * from ssc_danma_kua_hewei
+        select
+          s.ssc_number,
+          s.ssc_danma_tou,
+          s.ssc_he,
+          s.ssc_hewei,
+          s.ssc_hewei_duima,
+          s.ssc_shadan,
+          s.ssc_kuadu,
+          s.ssc_switch,
+          s.ssc_touzhuma_count,
+          s.ssc_is_zhong
+        from
+          ssc_danma_kua_hewei as s
     </select>
 
 </mapper>

@@ -1,10 +1,11 @@
 package com.goodcub.core.utils.page;
 
 
+import com.github.pagehelper.Page;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
-import com.github.pagehelper.Page;
 
 /**
  * @Author Luo.z.x
