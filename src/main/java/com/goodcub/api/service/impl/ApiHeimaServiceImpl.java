@@ -29,9 +29,8 @@ public class ApiHeimaServiceImpl implements ApiHeimaService {
 
     @Override
     public TableDataInfo resultList(int page, int limit, String order) {
-
         PageHelper.startPage(page, limit).setOrderBy("ssc_number "+order);
-        List<SscDanMaKuaHewei>  resultList = sscDanmaKuaHeweiMapper.querySscDanMaKuaHeweiList();
+        List<SscDanMaKuaHewei> resultList = sscDanmaKuaHeweiMapper.querySscDanMaKuaHeweiList();
         PageInfo<SscDanMaKuaHewei> resultPageInfo = new PageInfo<>(resultList);
 
         TableDataInfo tableDataInfo = new TableDataInfo();
