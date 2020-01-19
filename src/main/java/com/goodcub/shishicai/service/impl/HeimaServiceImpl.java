@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -55,6 +57,7 @@ public class HeimaServiceImpl implements HeimaService {
     @Transactional
     public void updateOpenResult(SscTempInfo sscTempInfo, String result, String currentDan, String preNumber) {
         try {
+
             // 更新临时表
             sscTempInfoMapper.updateTempResult(sscTempInfo);
 
@@ -80,7 +83,7 @@ public class HeimaServiceImpl implements HeimaService {
                 // 黑马玩法对应的信息
                 SscDanMaKuaHewei sscDanMaKuaHewei = new SscDanMaKuaHewei();
                 sscDanMaKuaHewei.setId(idWorker.nextId());
-                sscDanMaKuaHewei.setSscNumber(sscTempInfo.getSscNumber());
+                sscDanMaKuaHewei.setSscNumber(nextNumber(sscTempInfo.getSscNumber()));
 
                 // step1 确定胆码
                 // 是否换胆? 换大胆还是换小胆:0表示不换,1表示还成小胆,2表示换成大胆
@@ -100,7 +103,7 @@ public class HeimaServiceImpl implements HeimaService {
                 // 更新ssc_temp_info_attr表,记录下一把做号应该采用的胆码,和需要需要修改的记录的期数
                 Map<String,Object> paramMap = new HashMap<>();
                 paramMap.put("currentDan",newDanStr);
-                paramMap.put("preNumber",sscTempInfo.getSscNumber());
+                paramMap.put("preNumber",nextNumber(sscTempInfo.getSscNumber()));
                 sscTempInfoMapper.updateCurrentDan(paramMap);
 
                 sscDanMaKuaHewei.setSscDanmaAll(newDanStr);
@@ -131,7 +134,7 @@ public class HeimaServiceImpl implements HeimaService {
 
                 // step6 用胆码生成号码
                 List<String> resultList = resultArr(newDan.substring(0, newDan.length() - 1));
-
+                sscDanMaKuaHewei.setSscTouzhumaSource(StringUtils.strip(resultList.toString() , "[]"));
                 // System.out.println("由胆码生成的号码:" + resultList.toString());
                 // System.out.println("号码个数:" + resultList.size());
 
@@ -172,7 +175,7 @@ public class HeimaServiceImpl implements HeimaService {
                 if(preSscDanMaKuaHewei!=null) {
                     SscDanMaKuaHewei updateSscDanMaKuaHewei = new SscDanMaKuaHewei();
                     updateSscDanMaKuaHewei.setId( preSscDanMaKuaHewei.getId() );
-                    // 判断是否中奖
+                    // 判断700注左右是否中奖
                     String preZhuMa = preSscDanMaKuaHewei.getSscTouzhuma();
                     String housanResult = resultArr[0].concat(resultArr[1]).concat(resultArr[2]);
 
@@ -183,6 +186,17 @@ public class HeimaServiceImpl implements HeimaService {
                         updateSscDanMaKuaHewei.setSscIsZhong(0);
                         //updateSscDanMaKuaHewei.setSscShouyi(zhumaCount );
                     }
+
+                    // 判断785注左右是否中奖
+                    String preZhuMa785 = preSscDanMaKuaHewei.getSscTouzhumaSource();
+
+                    if(preZhuMa785.contains(housanResult)){
+                        updateSscDanMaKuaHewei.setSscTouzhumaSourceIsZhong(1);
+                    }else{
+                        updateSscDanMaKuaHewei.setSscTouzhumaSourceIsZhong(0);
+                    }
+
+
                     // 更新中奖结果
                     sscDanmaKuaHeweiMapper.updateDanmaKuaHewei(updateSscDanMaKuaHewei);
                 }
@@ -192,6 +206,29 @@ public class HeimaServiceImpl implements HeimaService {
             }
         }catch (Exception e){
             e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 根据指定期号获得下一期期号
+     * @param currentNumber
+     * @return
+     */
+    private String nextNumber(String currentNumber){
+        String[] numberArr = currentNumber.split("-");
+        String number = numberArr[1];
+        if("1440".equals(number)){
+            //当前时间
+            Calendar calendar1 = Calendar.getInstance();
+            calendar1.set(calendar1.get(Calendar.YEAR), calendar1.get(Calendar.MONTH), calendar1.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+
+            calendar1.add(Calendar.DAY_OF_MONTH, +1);
+            String numberDatePart = new SimpleDateFormat("yyyyMMdd").format(calendar1.getTime());
+            return numberDatePart + "-0001";
+        }else{
+            DecimalFormat df=new DecimalFormat("0000");
+            return numberArr[0]+"-" + df.format(Integer.parseInt(number) + 1);
         }
     }
 

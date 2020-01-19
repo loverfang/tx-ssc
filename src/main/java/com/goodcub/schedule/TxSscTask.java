@@ -4,15 +4,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.goodcub.core.utils.HttpClientUtil;
 import com.goodcub.shishicai.entity.SscTempInfo;
-import com.goodcub.shishicai.service.FourStartService;
 import com.goodcub.shishicai.service.HeimaService;
-import com.goodcub.shishicai.service.impl.FourStartServiceImpl;
-import com.xxl.job.core.biz.model.ReturnT;
-import com.xxl.job.core.handler.IJobHandler;
-import com.xxl.job.core.handler.annotation.JobHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.RetryException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -22,23 +21,27 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * 跨平台Http任务
- *
- * @author xuxueli 2018-09-16 03:48:34
+ * @ClassName TxSscTask
+ * @Description TODO
+ * @Author Luo.z.x
+ * @Date 2020/1/1210:51
+ * @Version 1.0
  */
-@JobHandler(value = "httpJobHandler")
 @Component
-public class HttpJobHandler extends IJobHandler {
-
-    private Logger logger = LoggerFactory.getLogger(HttpJobHandler.class);
-
+public class TxSscTask {
+    private Logger logger = LoggerFactory.getLogger(TxSscTask.class);
     private static final String requestUrl = "http://77tj.org/api/tencent/onlineim";
 
     @Resource
     HeimaService heimaService;
 
-    @Override
-    public ReturnT<String> execute(String param) throws Exception {
+    @Retryable(
+        value={RetryException.class},  //出现指定异常就补偿
+        maxAttempts=10,  //重试次数
+        backoff = @Backoff(value = 1000)//每次重试延迟毫秒数
+    )
+    @Scheduled(cron = "3,15,30,50 * * * * ?")//没分钟的低3秒开始每20秒执行一次即：第3秒执行一次，第28秒执行一次,第53秒执行一次
+    public void retry() {
 
         String currentNumber = number();
         Date currentDate = new Date();
@@ -56,9 +59,9 @@ public class HttpJobHandler extends IJobHandler {
                 if(jsonArray != null && jsonArray.size()> 0){
 
                     JSONObject obj = jsonArray.getJSONObject(0);
-                    logger.info("最近一条记录 >>>>>>>> " + obj.toJSONString());
-                    String currentTime = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(currentDate);
+
                     String targetTimme = obj.getString("onlinetime").substring(0, obj.getString("onlinetime").lastIndexOf(":"));
+                    String currentTime = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(currentDate);
 
                     if(obj != null && !"".equals(obj.getString("onlinetime"))){
                         logger.info("第"+currentNumber+"期,结果："+results(obj.getString("onlinenumber")));
@@ -78,36 +81,52 @@ public class HttpJobHandler extends IJobHandler {
                             if(!currentNumber.equals(checkSscTempInfo.getSscNumber())) {
                                 heimaService.updateOpenResult(tempInfo, results(obj.getString("onlinenumber")),checkSscTempInfo.getCurrentDan(), checkSscTempInfo.getPreNumber());
                             }
+
+                        }else{
+
+                            logger.debug("数据加载失败!!!!");
+                            // 官方数据开奖缓慢或者数据错误
+                            // 用上期的数据填充(或者直接不管他数据情况),注意此处在本分钟结尾的时候修改
+                            String currentFormatDateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(currentDate);
+                            String timeString = currentFormatDateString.substring(currentFormatDateString.length()-2);
+
+                            Integer currentSecond = Integer.valueOf( timeString );
+
+                            if(currentSecond >= 58){
+                                logger.debug("数据加载失败,默认数据填充！！！");
+                                SscTempInfo tempInfo = new SscTempInfo();
+                                tempInfo.setId(1L);
+                                tempInfo.setOnlineTime(obj.getString("onlinetime"));
+                                heimaService.updateOpenResult(tempInfo, results(obj.getString("onlinenumber")), sscTempInfo.getCurrentDan(), sscTempInfo.getPreNumber());
+                            }
                         }
 
-                        return new ReturnT(200,obj.toJSONString());
                     }else{
-                        logger.debug("数据加载失败!!!!");
-                        // 官方数据开奖缓慢或者数据错误
-                        // 用上期的数据填充(或者直接不管他数据情况),注意此处在本分钟结尾的时候修改
-                        Integer currentSecond = Integer.valueOf(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(currentDate).substring(currentTime.length()-2));
-                        if(currentSecond >= 58){
-                            logger.debug("数据加载失败,默认数据填充！！！");
-                            SscTempInfo tempInfo = new SscTempInfo();
-                            tempInfo.setId(1L);
-                            tempInfo.setOnlineTime(obj.getString("onlinetime"));
-                            heimaService.updateOpenResult(tempInfo, results(obj.getString("onlinenumber")), sscTempInfo.getCurrentDan(), sscTempInfo.getPreNumber());
-                        }
-                        return new ReturnT(200,obj.toJSONString());
+                        throw new RetryException("开奖方返回的开奖结果是空数据,再次去拿数据.");
                     }
+
                 }else{
-                    return FAIL;
+                    throw new RetryException("数据处理异常了或返回数据格式错了,再次去拿数据.");
                 }
+
             }else{
-                return FAIL;
+                throw new RetryException("时间到了,开奖方返回的是空数据,再次去拿数据.");
             }
+
         }else{
-            return FAIL;
+            throw new RetryException("时间到了,但是开奖方和我们数据相同,再次去拿数据.");
         }
+
+    }
+
+    @Recover
+    public void recover(RetryException e) {
+        // TODO
+        // System.out.println( e.getMessage() );
     }
 
     /**
-     * 获得下一期的期号
+     * 获得当前分钟数应该对应的期号
      * @return
      */
     private String number(){
@@ -155,5 +174,4 @@ public class HttpJobHandler extends IJobHandler {
         finalResult.insert(0, ",").insert(0, sumStr.substring(sumStr.length() - 1));
         return finalResult.toString();
     }
-
 }

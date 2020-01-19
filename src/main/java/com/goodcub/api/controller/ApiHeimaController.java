@@ -32,4 +32,10 @@ public class ApiHeimaController {
         return ResultResponse.ok().put("data", apiHeimaService.resultList(page, limit, order == null ? "asc":order));
     }
 
+    @RequestMapping("/detail")
+    @ResponseBody
+    public ResultResponse detail(String sscNumber){
+        return ResultResponse.ok().put("data", apiHeimaService.resultDetail(sscNumber));
+    }
+
 }

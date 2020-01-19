@@ -25,4 +25,8 @@ public class SscDanMaKuaHewei {
     private Integer sscTouzhumaCount; //'投注号码个数',
     private String sscShouyi;   //'收益(根据开奖结果算)',
     private Integer sscIsZhong; //'是否中奖',
+    private String result;      //‘开奖号码’
+
+    private String sscTouzhumaSource; //原本的785注号码
+    private Integer sscTouzhumaSourceIsZhong; //原本号码中奖结果
 }

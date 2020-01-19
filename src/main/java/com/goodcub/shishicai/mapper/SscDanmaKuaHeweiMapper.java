@@ -1,8 +1,6 @@
 package com.goodcub.shishicai.mapper;
 
 import com.goodcub.shishicai.entity.SscDanMaKuaHewei;
-import com.goodcub.shishicai.entity.SscTempInfo;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 

@@ -3,6 +3,7 @@ package com.goodcub.api.service;
 import com.github.pagehelper.PageInfo;
 import com.goodcub.api.entity.SscDanMaKuaHeweiVo;
 import com.goodcub.core.utils.page.TableDataInfo;
+import com.goodcub.shishicai.entity.SscDanMaKuaHewei;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -14,4 +15,6 @@ import org.apache.commons.logging.LogFactory;
  **/
 public interface ApiHeimaService {
     TableDataInfo resultList(int page, int limit, String order);
+
+    SscDanMaKuaHewei resultDetail(String sscNumber);
 }

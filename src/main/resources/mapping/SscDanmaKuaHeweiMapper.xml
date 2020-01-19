@@ -18,7 +18,9 @@
          ssc_touzhuma,
          ssc_touzhuma_count,
          ssc_shouyi,
-         ssc_is_zhong
+         ssc_is_zhong,
+         ssc_touzhuma_source,
+         ssc_touzhuma_source_is_zhong
        )value(
          #{id},
          #{sscNumber},
@@ -33,7 +35,9 @@
          #{sscTouzhuma},
          #{sscTouzhumaCount},
          #{sscShouyi},
-         #{sscIsZhong}
+         #{sscIsZhong},
+         #{sscTouzhumaSource},
+         #{sscTouzhumaSourceIsZhong}
        )
     </insert>
 
@@ -53,12 +57,14 @@
             <if test="sscTouzhumaCount!=null">ssc_touzhuma_count=#{sscTouzhumaCount},</if>
             <if test="sscShouyi!=null">ssc_shouyi=#{sscShouyi},</if>
             <if test="sscIsZhong!=null">ssc_is_zhong=#{sscIsZhong},</if>
+            <if test="sscTouzhumaSource!=null">ssc_touzhuma_source=#{sscTouzhumaSource},</if>
+            <if test="sscTouzhumaSourceIsZhong!=null">ssc_touzhuma_source_is_zhong=#{sscTouzhumaSourceIsZhong},</if>
         </trim>
         WHERE id=#{id}
     </update>
 
     <select id="querySscDanMaKuaHeweiBySscNumber" resultType="com.goodcub.shishicai.entity.SscDanMaKuaHewei">
-        select s.ssc_number,s.ssc_touzhuma from ssc_danma_kua_hewei as s where s.ssc_number=#{sscNumber}
+        select * from ssc_danma_kua_hewei as s where s.ssc_number=#{sscNumber}
     </select>
 
     <select id="querySscDanMaKuaHeweiList" resultType="com.goodcub.shishicai.entity.SscDanMaKuaHewei">
@@ -72,9 +78,12 @@
           s.ssc_kuadu,
           s.ssc_switch,
           s.ssc_touzhuma_count,
-          s.ssc_is_zhong
+          s.ssc_is_zhong,
+          s.ssc_touzhuma_source_is_zhong,
+          h.result
         from
           ssc_danma_kua_hewei as s
+          left join ssc_history_data as h on h.ssc_number = s.ssc_number
     </select>
 
 </mapper>

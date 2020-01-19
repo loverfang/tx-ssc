@@ -25,4 +25,5 @@ public class SscDanMaKuaHeweiVo {
     private Integer sscTouzhumaCount; //'投注号码个数',
     private String sscShouyi;   //'收益(根据开奖结果算)',
     private Integer sscIsZhong; //'是否中奖',
+    private String result;      //‘开奖号码’
 }

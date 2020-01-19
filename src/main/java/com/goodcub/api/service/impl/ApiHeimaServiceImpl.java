@@ -43,4 +43,8 @@ public class ApiHeimaServiceImpl implements ApiHeimaService {
         return tableDataInfo;
     }
 
+    @Override
+    public SscDanMaKuaHewei resultDetail(String sscNumber) {
+        return sscDanmaKuaHeweiMapper.querySscDanMaKuaHeweiBySscNumber( sscNumber );
+    }
 }
