@@ -30,7 +30,7 @@ import java.util.Date;
 @Component
 public class TxSscTask {
     private Logger logger = LoggerFactory.getLogger(TxSscTask.class);
-    private static final String requestUrl = "http://77tj.org/api/tencent/onlineim";
+    private static final String requestUrl = "http://77tj.org/api/tencent/online";
 
     @Resource
     HeimaService heimaService;

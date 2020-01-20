@@ -216,6 +216,7 @@ public class HeimaServiceImpl implements HeimaService {
      * @return
      */
     private String nextNumber(String currentNumber){
+
         String[] numberArr = currentNumber.split("-");
         String number = numberArr[1];
         if("1440".equals(number)){
@@ -223,13 +224,14 @@ public class HeimaServiceImpl implements HeimaService {
             Calendar calendar1 = Calendar.getInstance();
             calendar1.set(calendar1.get(Calendar.YEAR), calendar1.get(Calendar.MONTH), calendar1.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
 
-            calendar1.add(Calendar.DAY_OF_MONTH, +1);
+            calendar1.add(Calendar.DAY_OF_MONTH, 0);
             String numberDatePart = new SimpleDateFormat("yyyyMMdd").format(calendar1.getTime());
             return numberDatePart + "-0001";
         }else{
             DecimalFormat df=new DecimalFormat("0000");
             return numberArr[0]+"-" + df.format(Integer.parseInt(number) + 1);
         }
+
     }
 
     public static int kuadu(String[] resultArr){
